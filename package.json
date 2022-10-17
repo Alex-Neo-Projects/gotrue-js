@@ -1,15 +1,9 @@
 {
-  "name": "@supabase/gotrue-js",
-  "version": "0.0.0",
-  "description": "Isomorphic GoTrue client",
-  "keywords": [
-    "gotrue",
-    "supabase",
-    "auth",
-    "authentication"
-  ],
-  "homepage": "https://github.com/supabase/gotrue-js",
-  "bugs": "https://github.com/supabase/gotrue-js/issues",
+  "name": "internetfriends-gotrue-js",
+  "version": "1.0.0",
+  "description": "Had to fix a bug",
+  "homepage": "https://internetfriends.io",
+  "bugs": "https://github.com/Alex-Neo-Projects/gotrue-js",
   "license": "MIT",
   "author": "Supabase",
   "files": [
