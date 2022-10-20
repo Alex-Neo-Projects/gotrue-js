@@ -1,17 +1,11 @@
 {
-  "name": "@supabase/gotrue-js",
-  "version": "0.0.0",
-  "description": "Isomorphic GoTrue client",
-  "keywords": [
-    "gotrue",
-    "supabase",
-    "auth",
-    "authentication"
-  ],
-  "homepage": "https://github.com/supabase/gotrue-js",
-  "bugs": "https://github.com/supabase/gotrue-js/issues",
+  "name": "internetfriends-gotrue-js",
+  "version": "2.0.0",
+  "description": "fixing a bug, plz ignore",
+  "homepage": "https://github.com/Alex-Neo-Projects/internet-friends-gotrue-js",
+  "bugs": "https://github.com/Alex-Neo-Projects/internet-friends-gotrue-js/issues",
   "license": "MIT",
-  "author": "Supabase",
+  "author": "internetfriends",
   "files": [
     "dist",
     "src"
@@ -19,7 +13,7 @@
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
   "types": "dist/module/index.d.ts",
-  "repository": "supabase/gotrue-js",
+  "repository": "Alex-Neo-Projects/internetfriends-supabase-js/gotrue-js",
   "scripts": {
     "clean": "rimraf dist docs",
     "coverage": "echo \"run npm test\"",

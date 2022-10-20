@@ -1,50 +1,16 @@
-# `gotrue-js`
+# `internet-friends-gotrue-js`
 
-An isomorphic JavaScript client library for the [GoTrue](https://github.com/supabase/gotrue) API.
+This is a fork of @supabase/gotrue-js
 
-## Docs
+## NOTE: THIS IS NOT SUPPORTED, AND ONLY USED BY US. DO NOT USE THIS PACKAGE UNLESS YOU WORK AT INTERNET FRIENDS, INC
 
-- Using `gotrue-js`: https://supabase.com/docs/reference/javascript/auth-signup
-- TypeDoc: https://supabase.github.io/gotrue-js/
+The reason I had to fork was because I had to fix two bugs on v2.0.0 of supabase that were affecting my project:
 
-## Quick start
 
-Install
+1) [Requests made when a JWT token expires always fail] (https://github.com/supabase/gotrue-js/issues/487#issuecomment-1277997525)
+  - Fix: [#482](https://github.com/supabase/gotrue-js/pull/482). I added this code diff to this repo
 
-```bash
-npm install --save @supabase/gotrue-js
-```
-
-Usage
-
-```js
-import { GoTrueClient } from '@supabase/gotrue-js'
-
-const GOTRUE_URL = 'http://localhost:9999'
-
-const auth = new GoTrueClient({ url: GOTRUE_URL })
-```
-
-- `signUp()`: https://supabase.io/docs/reference/javascript/auth-signup
-- `signIn()`: https://supabase.io/docs/reference/javascript/auth-signin
-- `signOut()`: https://supabase.io/docs/reference/javascript/auth-signout
-
-### Custom `fetch` implementation
-
-`gotrue-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests, but an alternative `fetch` implementation can be provided as an option. This is most useful in environments where `cross-fetch` is not compatible, for instance Cloudflare Workers:
-
-```js
-import { GoTrueClient } from '@supabase/gotrue-js'
-
-const GOTRUE_URL = 'http://localhost:9999'
-
-const auth = new GoTrueClient({ url: GOTRUE_URL, fetch: fetch })
-```
-
-## Sponsors
-
-We are building the features of Firebase using enterprise-grade, open source products. We support existing communities wherever possible, and if the products don’t exist we build them and open source them ourselves.
-
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
-
-![Watch this repo](https://gitcdn.xyz/repo/supabase/monorepo/master/web/static/watch-repo.gif 'Watch this repo')
+2) [Supabase kept logging my users out after they logged in after a couple of days](https://github.com/supabase/supabase/issues/9668) - This one is still unfixed
+  - What I'm doing about it: adding sentry logging to try and get closer to the issue and figure out: 
+    1) how often it's happening
+    2) what the logs look like around it

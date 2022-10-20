@@ -120,6 +120,7 @@ export default class GoTrueClient {
     this.fetch = resolveFetch(settings.fetch)
     this.detectSessionInUrl = settings.detectSessionInUrl
 
+    console.log('running internet-friends gotrue')
     this.initialize()
   }
 
