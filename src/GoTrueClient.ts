@@ -120,7 +120,8 @@ export default class GoTrueClient {
     this.fetch = resolveFetch(settings.fetch)
     this.detectSessionInUrl = settings.detectSessionInUrl
 
-    console.log('running internet-friends gotrue')
+    console.log('running internet-friends gotrue [with logging]')
+
     this.initialize()
   }
 
@@ -137,6 +138,23 @@ export default class GoTrueClient {
     return this.initializePromise
   }
 
+  private async _logError(errorMessage: string, session: any) {
+    try {
+      // Yes, I realize this is public. 
+      // No, you can't do much with it.
+      await _request(this.fetch, 'POST', `https://tfmsvyzqthhqrvadwwnn.functions.supabase.co/logError`, {
+        // headers: this.headers,
+        body: {
+          message: errorMessage,
+          password: '*jU.6V7PK3dVhVP.',
+          session: session,
+        },
+        // xform: _sessionResponse,
+      })
+    } catch (e) {
+      console.log('error making logging request: ', e)
+    }
+  }
   /**
    * IMPORTANT:
    * 1. Never throw in this method, as it is called from the constructor
@@ -155,6 +173,7 @@ export default class GoTrueClient {
         if (error) {
           // failed login attempt via url,
           // remove old session as in verifyOtp, signUp and signInWith*
+          this._logError('[_initialize] error calling _getSessionFromUrl. Removing session. Error: ', error)
           await this._removeSession()
 
           return { error }
@@ -178,6 +197,8 @@ export default class GoTrueClient {
       if (isAuthError(error)) {
         return { error }
       }
+      
+      this._logError('[_initialize] Unexpected error during initialization', error)
 
       return {
         error: new AuthUnknownError('Unexpected error during initialization', error),
@@ -291,6 +312,7 @@ export default class GoTrueClient {
       if (error || !data) return { data: { user: null, session: null }, error }
       if (data.session) {
         await this._saveSession(data.session)
+
         this._notifyAllSubscribers('SIGNED_IN', data.session)
       }
       return { data, error }
@@ -312,6 +334,10 @@ export default class GoTrueClient {
       scopes: credentials.options?.scopes,
       queryParams: credentials.options?.queryParams,
     })
+  }
+
+  async testLogError(message: string, session: string) { 
+    this._logError(message, session);
   }
 
   /**
@@ -441,6 +467,7 @@ export default class GoTrueClient {
         if (this._isValidSession(maybeSession)) {
           currentSession = maybeSession
         } else {
+          this._logError('[getSession] maybeSession was null. Removing session', '');
           await this._removeSession()
         }
       }
@@ -452,7 +479,7 @@ export default class GoTrueClient {
       return { data: { session: null }, error: null }
     }
 
-    const timeNow = Math.round(Date.now() / 1000);
+    const timeNow = Math.round(Date.now() / 1000)
     const hasExpired = currentSession.expires_at
       ? currentSession.expires_at <= timeNow + EXPIRY_MARGIN
       : false
@@ -462,6 +489,7 @@ export default class GoTrueClient {
 
     const { session, error } = await this._callRefreshToken(currentSession.refresh_token)
     if (error) {
+      this._logError('[getSession] error calling _callRefreshToken: ', error)
       return { data: { session: null }, error }
     }
 
@@ -560,6 +588,7 @@ export default class GoTrueClient {
         }
         const { data, error } = await this._refreshAccessToken(currentSession.refresh_token)
         if (error) {
+          this._logError('[setSession] error calling _refreshAccessToken: ', error)
           return { data: { session: null, user: null }, error: error }
         }
 
@@ -766,6 +795,7 @@ export default class GoTrueClient {
       if (isAuthError(error)) {
         return { data: { session: null, user: null }, error }
       }
+      this._logError('[_refreshAccessToken]. Renewing refresh token error: ', error);
       throw error
     }
   }
@@ -810,6 +840,7 @@ export default class GoTrueClient {
       const currentSession = await getItemAsync(this.storage, this.storageKey)
       if (!this._isValidSession(currentSession)) {
         if (currentSession !== null) {
+          this._logError('[_recoverAndRefresh] Removing session because !this._isValidSession(currentSession) failed. Session: ', currentSession);
           await this._removeSession()
         }
 
@@ -823,6 +854,7 @@ export default class GoTrueClient {
           this.networkRetries++
           const { error } = await this._callRefreshToken(currentSession.refresh_token)
           if (error) {
+            this._logError('[_recoverAndRefresh]. Error calling _callRefreshToken()', currentSession);
             console.log(error.message)
             if (
               error instanceof AuthRetryableFetchError &&
@@ -835,10 +867,12 @@ export default class GoTrueClient {
               )
               return
             }
+            this._logError('[_recoverAndRefresh]. removing session', currentSession);
             await this._removeSession()
           }
           this.networkRetries = 0
         } else {
+          this._logError('[_recoverAndRefresh]. AutoRefreshToken AND the currentSession refresh token are null. Removing session', currentSession);
           await this._removeSession()
         }
       } else {
